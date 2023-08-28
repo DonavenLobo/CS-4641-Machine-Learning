@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Project Car Value Estimator</title>
+    <meta
+      charset="utf-8"
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    />
+    <link
+      target="_blank" href="css/frame.css"
+      media="screen"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      target="_blank" href="css/controls.css"
+      media="screen"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      target="_blank" href="css/custom.css"
+      media="screen"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      target="_blank" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      target="_blank" href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      target="_blank" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700"
+      rel="stylesheet"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="js/menu.js"></script>
+    <style>
+      .menu-index {
+        color: rgb(255, 255, 255) !important;
+        opacity: 1 !important;
+        font-weight: 700 !important;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="menu-container"></div>
+    <div class="content-container">
+      <div class="content">
+          <!--Start Text Only-->
+            <div class="flex-item flex-column">
+              <h2>Midterm Report</h2>
+              <h3>Intro / Background Info</h3>
+              <hr />
+              <p class="text">
+                When purchasing a used vehicle, there are many factors one must take into consideration. The value of a car must be determined by much more than the make and model, making price evaluation a critical part of the process. A machine learning model can be developed to optimize the selection process for the benefit of consumers.</p>
+              <p class="text">
+                There are some literature review examples on car evaluation using machine learning that can shed light on the topic. For example, the comparative analysis done by Chen, Hao, and Xu which compared different models using random forest (RF) and linear regression (LR) methods [1]. They performed a 5-fold cross validation‒4 training sets and 1 testing‒and compared them based on a normalized mean square error. They concluded that for models using different features, LR and RF performance varied and used NMSE to rank model accuracy. Another example is the work of Maddali, who observed California car prices [2]. Tested many regression models including Linear Regression, Decision Tree Regressor, Gradient Boosting, and MLP Regressor. They concluded that decision tree regressor was the best suited option based on the Mean Absolute Error of each model.
+              </p>
+              <h3>Problem Definition</h3>
+              <hr />
+              <p class="text">
+                In 2021, a global chip shortage caused a major price surge for used cars. As a result, car manufacturers could not produce enough vehicles as demanded. Since then, it has been increasingly difficult to distinguish whether car listings are too expensive or a good deal. With so much data available, a model can simply extrapolate a car’s value using its features, such as: mileage, owner count, accidents, wheel system, body type, and manufacturer.
+              </p>
+
+              <h3>Methods used</h3>
+              <hr />
+              <p>K-th Fold Cross Validation:</p>
+                <ul>
+                <li>This method was used to optimize our model&rsquo;s learning rate hyper-parameter.</li>
+                <li>A value of&nbsp; k = 5 was used (i.e 20% of the data was separated and used as testing).</li>
+                <li>&nbsp;This process was done for both the full data set (2.5 million rows) and for the 15K+ miles (1.2 million rows) data set, and an epoch of 25 was used for both.</li>
+                <li>Learning rates [0.01, 0.025, 0.05, 0.1, 0.2] were tested on the full data set and again for the 15K+ miles data set, with the exception of 0.2 since it performed so poorly in the full data set. Graphs for these results can be found in the figures section at the end of this report.</li>
+                </ul>
+                <p>Linear Regression Model:</p>
+                <ul>
+                <li>Used TensorFlow&rsquo;s keras Sequential model [3] with a normalizer layer since each feature has its own range which varies. We also included multiple dense layers with 3 dense layers with (16, 32, 5) units respectively. That gave us more parameters to train, but also helped improve our overall error.</li>
+                <li>The optimizer used was called &lsquo;Adam&rsquo; and the loss function used was &lsquo;Mean absolute error&rsquo;</li>
+                <li>Feature encoding convention:</li>
+                <ul>
+                <li>&ldquo;Has_accidents&rdquo;: 0 if false and 1 if true.</li>
+                <li>&ldquo;Wheel_system&rdquo;, &ldquo;make_name&rdquo;, and &ldquo;body_type&rdquo;: one-hot encode.</li>
+                <li>&ldquo;Major_options&rdquo;: grouped similar options together (ending up with 76 categories and then, one-hot encode.</li>
+                </ul>
+                <li>For this model, &ldquo;exterior_color&rdquo;, &ldquo;dealer_zip&rdquo;, &ldquo;model_name&rdquo;, &ldquo;trim_name&rdquo;, and &ldquo;listed_date&rdquo; were removed primarily because it became too specific and the body type and make name provided a good enough description of the car.</li>
+                <li>Total number of features trained in this model was 156.</li>
+                </ul>
+
+              <h3>Data Collection / Cleaning</h3>
+              <hr />
+              <p class="text">
+                We utilized a large dataset of over 3 million data points with 66 features and a high feature fill rate, but it required some data cleaning to eliminate incorrect prices and identify the crucial features for our model's training.
+                <br/>
+                After analyzing which features would significantly impact car prices, we selected the following 14 features: <em>price, body_type, exterior_color, has_accidents, listed_date, make_name, mileage, model_name, owner_count, year, dealer_zip, major_options, trim_name, and wheel_system</em>. 
+                To address missing data in <em>has_accidents</em> and <em>owner_count</em>, we assigned false and 1, respectively. 
+                <br/>
+                We also removed rows with invalid values, resulting in a cleaned dataset of <strong>2,528,608</strong> rows.
+              </p>
+              <p>
+                To better visualize our data, we split up our data body type and demonstrated the data on a bar chart. Additionally each bar was split up by make. This figure is shown below.
+                <br/>
+                <img src="/img/midterm/MakesBodyTypeColumns.png" width="100%">
+                <br/>
+                To more clearly demonstrate the percentage breakdown by body type, we also used a pie chart.
+                <img src="/img/midterm/bodyTypePie.png" width="100%">
+                <br/>
+                By those graphs we can observe the high presence of SUV/Crossover cars in our cleaned dataset with 48.1% of presence. Followed by Sedan and Vans with 25.5% and 14.7% respectively.
+                <br/>
+                On the first graph we also can observe that certain makes are highly present in specific body types. For example RAM is mostly present on Pickup Truck, while Tesla is more present in SUV/Crossover and Sedan.
+              </p>
+              <p>
+              [3] <a target="_blank" href="https://www.kaggle.com/datasets/ananaymital/us-used-cars-dataset">https://www.kaggle.com/datasets/ananaymital/us-used-cars-dataset</a>
+              </p>
+              
+              <h3>Results and Discussion</h3>
+              <hr />
+              <p class="text">
+                TODO
+              </p>
+              
+              <h3>References</h3>
+              <hr />
+              <ul>
+                <li>
+                  [1] C. Chen, L. Hao, and C. Xu, “Comparative analysis of used car price evaluation models,” AIP Publishing, 08-May-2017. [Online]. Available: https://aip.scitation.org/doi/abs/10.1063/1.4982530. [Accessed: 20-Feb-2023]. 
+                </li>
+                <li>
+                  [2] S. Maddali, “Predicting car prices using machine learning and Data Science,” Medium, 24-Aug-2022. [Online]. Available: https://medium.com/odscjournal/predicting-car-prices-using-machine-learning-and-data-science-52ed44abab1b. [Accessed: 20-Feb-2023]. 
+                </li>
+                <li>
+                  [3]“Basic regression: Predict fuel efficiency  :   Tensorflow Core,” TensorFlow. [Online]. Available: https://www.tensorflow.org/tutorials/keras/regression. [Accessed: 31-Mar-2023]. 
+                </li>
+                <li>
+                  [4] AnanayMital, “US used cars data set,” Kaggle, 21-Sep-2020. [Online]. Available: https://www.kaggle.com/datasets/ananaymital/us-used-cars-dataset. [Accessed: 22-Feb-2023]. 
+                </li>
+                <li>
+                  [5] A. Bajaj, “Performance metrics in machine learning,” neptune.ai, 17-Feb-2023. [Online]. Available: https://neptune.ai/blog/performance-metrics-in-machine-learning-complete-guide [Accessed: 22-Feb-2023].
+                </li>
+                <li>
+                  [6] “3.3. metrics and scoring: Quantifying the quality of predictions,” scikit. [Online]. Available: https://scikit-learn.org/stable/modules/model_evaluation.html. [Accessed: 20-Feb-2023].
+                </li>
+              </ul>
+              <h3>Contribution Table</h3>
+              <hr />
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Responsibilities for Midterm Report</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Ethan</td>
+                    <td>Worked on data cleaning, data parsing, graphing and in the linear regression model</td>
+                  </tr>
+                  <tr>
+                    <td>Matheus</td>
+                    <td>Worked on categorization of vehicle features, wrote data collection portion, updated the project website</td>
+                  </tr>
+                  <tr>
+                    <td>Nicholas</td>
+                    <td>Worked with Ethan on the linear regression model for this midterm report and wrote the methods portion</td>
+                  </tr>
+                  <tr>
+                    <td>Donaven</td>
+                    <td>Worked on results and discussion section</td>
+                  </tr>
+                  <tr>
+                    <td>Fernando</td>
+                    <td>Worked on results and discussion section</td>
+                  </tr>
+                  <tr>
+                  </tr>
+                </tbody>
+              </table>
+              <h3>Gantt Chart <a target="_blank" href="https://gtvault-my.sharepoint.com/:x:/g/personal/msantos48_gatech_edu/EYeMDDfB0ORAnqoDazvwIaABm6mFORCWpStZP1rb5nycQA?e=icpMZG">(Click here to open)</a></h3>
+              <hr />
+              <iframe width="860" height="720" frameborder="0" scrolling="no" src="https://gtvault-my.sharepoint.com/personal/msantos48_gatech_edu/_layouts/15/Doc.aspx?sourcedoc={370c8c87-d0c1-40e4-9eaa-036b3bf021a0}&action=embedview&wdAllowInteractivity=False&Item='Spring'!B6%3ADG40&wdDownloadButton=True&wdInConfigurator=True&wdInConfigurator=True&edesNext=true&resen=false&ed1JS=false"></iframe>
+              
+            </div>
+          <!--End Text Only-->
+          <!-------------------------------------------------------------------------------------------->
+          <!--Start Credits-->
+          <div class="flex-row">
+            <div class="flex-item flex-item-stretch flex-column">
+              <p class="text text-small text-italic add-top-margin-large">
+                Group Members:
+                <span class="highlight-text">Matheus Santos</span>,
+                <span class="highlight-text">Donaven Lobo</span>,
+                <span class="highlight-text">Fernando Sanz</span>,
+                <span class="highlight-text">Nicholas Cantrell</span>,
+                <span class="highlight-text">Ethan Povlot</span>
+              </p>
+            </div>
+          </div>
+          <!--End Credits-->
+          <!-------------------------------------------------------------------------------------------->
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
